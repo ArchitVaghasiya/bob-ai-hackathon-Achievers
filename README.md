@@ -1,4 +1,4 @@
-# **Drijesh PPatel**
+# **Drijesh Ppatel**
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Montserrat&weight=500&size=18&letterSpacing=1px&duration=2500&pause=5000&color=38C2FF&vCenter=true&width=435&lines=Engineering+Leader.+Speaker.+Mentor.)](https://git.io/typing-svg)
 
 [![](https://custom-icon-badges.demolab.com/badge/-Profile-gold?style=for-the-badge&logo=user&logoColor=black)](https://www.canva.com/design/DAGUOGjuN8M/yvI4FUQFjjIE8395iMs6rA/view?utm_content=DAGUOGjuN8M&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hd8cad2ed36)
