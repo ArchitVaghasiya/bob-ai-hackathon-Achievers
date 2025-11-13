@@ -24,6 +24,13 @@ I'm **Drijesh Ppatel**, a **Cybersecurity and Generative AI Thought Leader**, an
 * AI-driven innovation
 * Mentorship and leadership
 
+### **📚 Podcasts, Tech Sessions & Workshops**
+- [Podcast - Build Mode On With TST Technology | Small Town Boy Makes Tech Leader at IBM](https://youtu.be/rT_TE4wmTQA?si=b6Eta6B6KmzLvJBG)
+- [Expert Talk - Google DevFest Amedabad](https://youtu.be/zhfVTGsHLNw?si=JTFWOBbWa9XmzriC)
+- [Keynote - Google Developers Group Cloud Gandhinagar](https://youtu.be/VO6zNv2DQ48?si=u23QPUR7yDeEYtzf)
+- [Podcast - Ayushi Rawat Talk Show | Secure your money, data and career](https://youtu.be/o_R9tvH-jP0?si=nt5y3nqod81gvV2y)
+- [Podcast - Project Perks with Harkiran | Agile Leadership](https://youtu.be/KWNJx5nHimc?si=QV_ABD27FIMZztOc)
+
 ### **📚 Publications**
 - [A Skeptical Demeanor Revelation System Fused with Machine Learning Civil Cyber Security](https://ieeexplore.ieee.org/document/11059200)
 - [Streamlining Compliance and Governance with AI in Cloud-based Programs](https://www.ijfmr.com/research-paper.php?id=5213)
@@ -43,6 +50,8 @@ I'm **Drijesh Ppatel**, a **Cybersecurity and Generative AI Thought Leader**, an
 - **Informatica PowerCenter Developer Specialist**
 
 ### **🏆 Honours & Awards**
+- [Bharat Pratibha Samman Award](https://foxstoryindia.com/2025/09/11/bharat-pratibha-sammaan-award-ceremony-2025-celebrates-indias-unsung-heroes-mp-shri-anurag-thakur-graces-the-event-as-the-chief-guest/)
+- [Dynamic Leader of the Year - 2025](https://www.tribuneindia.com/news/business/mumbai-witnessed-business-leaders-educators-and-women-entrepreneurs-at-one-stage-at-the-much-anticipated-global-leadership-summit-2025/)
 - [Rising Tech Expert 2024](https://www.magzter.com/IN/height-of-success/Heights-Of-Success-Magazine/Business/1645864)
 - [20 Influential Personalities of India](https://www.aninews.in/news/business/business/meet-20-influential-personalities-who-are-breaking-barriers-and-shaping-the-future-in-202320231020160802/)
 - [40 under 40 - Influential Leaders](https://magazines.insightssuccess.in/2023/the-40-under-40-influential-leaders-2023-may2023/#page=52)
