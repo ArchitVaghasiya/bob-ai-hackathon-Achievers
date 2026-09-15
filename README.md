@@ -1,121 +1,105 @@
-# 🚀 [Your Project Title Here]
-
-> ⚠️ **Replace everything in `[ ]` brackets with your actual content before submission.**
+# 🚀 GridPulse AI
 
 ---
 
 ## 👥 Team
-
 | Field | Value |
 |---|---|
-| **Team Name** | [Your Team Name] |
-| **Track** | [AI / DevOps / Sustainability / Open] |
-| **Team Lead** | [Name] — [email@ibm.com] |
-| **Members** | [Name 1], [Name 2], [Name 3] |
+| **Team Name** | Achievers |
+| **Track** | AI |
+| **Team Lead** | Diksh Dharmendrabhai Trambadia — 24ce129@charusat.edu.in |
+| **Members** | Henisha Jiteshkumar Vyas, Archit Nileshbhai Vaghasiya, Akash Vanmalibhai Unagar |
 
 ---
 
 ## 🎯 Problem Statement
-
-> In 2–3 sentences: What problem does your project solve? Who experiences this problem?
-
-[Describe the real-world problem your project addresses. Be specific about who the user is and what pain point they face.]
+Utility companies frequently face sudden, critical transformer failures that can lead to massive power grid outages. Identifying these failures before they occur is extremely difficult due to the complex interplay of internal sensor data (e.g., Dissolved Gas Analysis, load variance), external weather conditions, and component aging. Without early warning systems, maintenance is entirely reactive, leading to longer downtimes and higher repair costs.
 
 ---
 
 ## 💡 Solution
-
-> In 2–3 sentences: What did you build? How does it solve the problem above?
-
-[Describe your solution clearly. Explain the core mechanism — what makes it work.]
+GridPulse AI is an AI-powered predictive maintenance and risk scoring platform. It synthesizes an Isolation Forest anomaly detector (for real-time sensor faults), an XGBoost Regressor (for thermal stress and weather impact), and a weighted Risk Scaling Algorithm. By converting complex machine learning outputs into a clean, prioritized risk index, grid operators can preemptively deploy maintenance crews to vulnerable substations before failure occurs.
 
 ---
 
 ## ✨ Key Features
-
-- **Feature 1:** [Brief description — e.g., "Real-time anomaly detection using watsonx.ai"]
-- **Feature 2:** [Brief description]
-- **Feature 3:** [Brief description]
-- **Feature 4:** [Optional]
-- **Feature 5:** [Optional]
+- **Real-time Anomaly Detection:** Uses an Isolation Forest model to detect multi-variate sensor anomalies (e.g., Vibration, Insulation Resistance, Dissolved Gas).
+- **Thermal Stress Prediction:** An XGBoost Regressor predicts the baseline transformer temperature given ambient weather context (temperature, humidity, wind) to highlight dangerous thermal deltas.
+- **Weighted Risk Index Algorithm:** Synthesizes ML failure probabilities (60% weight) with community impact severity (40% weight - e.g., hospitals connected) to generate a prioritized 0-100 risk index.
+- **Explainable AI Insights:** Unveils the top physical risk factors and deterministic explanations to empower maintenance crews with actionable context.
+- **Pre-positioning Dispatch:** A beautiful, responsive dashboard allowing operators to preemptively dispatch crews to high-risk substations before peak weather stress windows hit.
 
 ---
 
 ## 🛠️ Tech Stack
-
 | Category | Technologies |
 |---|---|
-| **Languages** | [e.g., Python, TypeScript] |
-| **Frameworks** | [e.g., FastAPI, React] |
-| **IBM Technologies** | [e.g., watsonx.ai, IBM Bob, IBM Cloud] |
-| **Databases** | [e.g., PostgreSQL, Redis] |
-| **Other** | [e.g., Docker, GitHub Actions] |
+| **Languages** | Python, TypeScript |
+| **Frameworks** | FastAPI, React (Vite) |
+| **IBM Technologies** | IBM Bob |
+| **Databases** | None (CSV / In-memory JSON) |
+| **Other** | Tailwind CSS, scikit-learn, XGBoost, Pandas |
 
 ---
 
 ## 📁 Repository Structure
-
 ```
-├── src/                  # All source code
-├── docs/                 # Written documentation
-│   ├── problem-statement.md
-│   ├── solution-overview.md
-│   ├── architecture.md
-│   └── setup-guide.md
-├── demo/                 # Demo artifacts
-│   ├── screenshots/      # App screenshots
-│   └── demo-video-link.txt  # Link to demo video
-├── presentation/         # Slide deck
-└── submission.yaml       # Structured submission metadata
+├── src/
+│   ├── Backend/          # Python FastAPI backend & ML models
+│   │   ├── ml_model/     # Jupyter Notebooks and trained .pkl files
+│   │   └── api/          # FastAPI routes
+│   └── Frontend/         # React + Vite application
+│       ├── src/          # UI Components, Styles, and Mock Data
+│       └── public/       # Static Assets
+├── README.md             # This submission file
 ```
 
 ---
 
 ## ⚡ How to Run
 
-> **Copy these exact steps from your [`docs/setup-guide.md`](docs/setup-guide.md)**
-
+### Backend (Python/FastAPI)
 ```bash
-# 1. Clone the repo
-git clone https://github.com/[your-repo].git
-cd [your-repo]
+# 1. Navigate to the backend directory
+cd src/Backend/ml_model
 
 # 2. Install dependencies
-[your install command here]
+pip install -r requirements.txt
 
-# 3. Configure environment
-cp .env.example .env
-# Edit .env with your values
-
-# 4. Run the project
-[your run command here]
+# 3. Start the API server
+python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --reload
 ```
+
+### Frontend (React/Vite)
+```bash
+# 1. Navigate to the frontend directory
+cd src/Frontend
+
+# 2. Install dependencies
+npm install
+
+# 3. Run the development server
+npm run dev
+```
+*The dashboard will be available at `http://localhost:5173`.*
 
 ---
 
 ## 🖥️ Demo
-
 | Artifact | Link |
 |---|---|
-| 📹 Demo Video | [See demo/demo-video-link.txt](demo/demo-video-link.txt) |
-| 🌐 Live Demo | [See demo/live-demo-url.txt](demo/live-demo-url.txt) |
-| 🖼️ Screenshots | [See demo/screenshots/](demo/screenshots/) |
-| 📊 Presentation | [See presentation/slides.pdf](presentation/) |
+| 📹 Demo Video | *(Add link if you have one)* |
+| 🌐 Live Demo | *(Add link if you have one)* |
+| 🖼️ Screenshots | *(Add link if you have one)* |
 
 ---
 
 ## ⚠️ Known Limitations
-
-> Be honest — judges appreciate transparency over overclaiming.
-
-- [Limitation 1: e.g., "Authentication is mocked — not production-ready"]
-- [Limitation 2: e.g., "Only tested on Chrome"]
-- [Limitation 3: e.g., "Feature X is scaffolded but not fully implemented"]
+- **Mocked Live Data:** The frontend currently renders the exact 3-model visual architecture requested using a hardcoded `mockData.ts` file for demonstration purposes. The live FastAPI backend is present but disconnected to preserve the specific UI layout.
+- **Synthetic Training Data:** The ML models in the backend were trained on synthetic/mocked transformer datasets.
+- **UI Simulation:** The "Pre-position Crew" dispatch action is a simulated UI toast alert and does not currently connect to a real dispatcher system.
 
 ---
 
 ## 🏅 What We're Most Proud Of
-
-[Tell the judges what part of your submission is strongest and worth paying close attention to.]
-
----
+We are most proud of the seamless integration of three distinct machine learning approaches (unsupervised anomaly detection, supervised thermal regression, and a deterministic weighted impact algorithm) into a singular, highly polished, responsive UI. Instead of presenting raw confusing data, the dashboard converts complex ML outputs into immediate, actionable insight wrapped in a premium, warm-toned aesthetic.
