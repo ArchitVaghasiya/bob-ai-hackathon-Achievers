@@ -11,7 +11,7 @@ import pandas as pd
 import psycopg2
 import psycopg2.extras
 from fastapi import FastAPI, HTTPException, Request, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field, field_validator
@@ -246,6 +246,10 @@ def process_single_transformer_payload(payload: TransformerPredictRequest) -> Di
 # -------------------------------------------------------------------------
 # API Endpoints
 # -------------------------------------------------------------------------
+
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse(url="/docs")
 
 @app.get(
     "/health",
