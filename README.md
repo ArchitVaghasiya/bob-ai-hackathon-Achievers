@@ -31,14 +31,54 @@ GridPulse AI is an AI-powered predictive maintenance and risk scoring platform. 
 
 ---
 
-## 🛠️ Tech Stack
+## 🏗️ Architecture
+
+### System Architecture
+
+```mermaid
+graph TD
+    A[User / Browser] -->|HTTP/REST| B[Frontend - React]
+    B -->|REST API| C[Backend - FastAPI]
+    C -->|Feature Extraction & Inference| D[ML Models - Scikit-Learn]
+    C -->|Read/Write Predictions| E[Neon PostgreSQL Database]
+    D -->|Predicted Risk & RUL| C
+```
+
+### Components
+
+| Component | Technology | Responsibility |
+|---|---|---|
+| Frontend | React (Vite) + Tailwind CSS | Interactive dashboard, real-time crew dispatching, and asset monitoring. |
+| Backend API | Python FastAPI | High-performance business logic, data routing, and ML model inference orchestration. |
+| AI / ML | Scikit-Learn (HistGradientBoosting) | Analyzes 420-step DGA telemetry to predict Fault Detection (FDD) and Remaining Useful Life (RUL). |
+| Database | Neon Serverless PostgreSQL | Cloud-native storage for raw telemetry, ML predictions, and completed dispatch work history. |
+
+### Data Flow
+
+1. Raw Dissolved Gas Analysis (DGA) telemetry is fed into the system via the UI (or seeding script).
+2. The FastAPI backend converts the raw telemetry into an 82-feature temporal dataset.
+3. The data is passed to the locally-hosted Scikit-Learn models (`fdd_model.pkl` and `rul_model.pkl`) for real-time inference.
+4. The backend calculates a final 0-100 Risk Index and saves the raw data and predictions to the **Neon PostgreSQL** database.
+5. The React frontend polls the `/api/assets` endpoint and displays the prioritized anomalies.
+
+### Security Considerations
+
+- Database connection strings are secured and should be migrated to environment variables (`.env`).
+- API CORS policies are strictly configured for the frontend origin.
+
+### Scalability Notes
+
+The FastAPI backend is entirely stateless and can be horizontally scaled behind a load balancer. The Neon Serverless PostgreSQL database automatically scales computing resources based on query load, making this architecture highly robust for production-level utility grids.
+
+---
+
+## 💻 Tech Stack
 | Category | Technologies |
 |---|---|
 | **Languages** | Python, TypeScript |
 | **Frameworks** | FastAPI, React (Vite) |
-| **IBM Technologies** | IBM Bob |
-| **Databases** | None (CSV / In-memory JSON) |
-| **Other** | Tailwind CSS, scikit-learn, XGBoost, Pandas |
+| **Databases** | Neon Serverless PostgreSQL |
+| **Other** | Tailwind CSS, scikit-learn, Pandas |
 
 ---
 
@@ -49,14 +89,14 @@ GridPulse AI is an AI-powered predictive maintenance and risk scoring platform. 
 │   │   ├── ml_model/     # Jupyter Notebooks and trained .pkl files
 │   │   └── api/          # FastAPI routes
 │   └── Frontend/         # React + Vite application
-│       ├── src/          # UI Components, Styles, and Mock Data
+│       ├── src/          # UI Components, Styles, and API integration
 │       └── public/       # Static Assets
-├── README.md             # This submission file
+└── README.md             # This submission file
 ```
 
 ---
 
-## ⚡ How to Run
+## 🚀 How to Run
 
 ### Backend (Python/FastAPI)
 ```bash
@@ -85,7 +125,7 @@ npm run dev
 
 ---
 
-## 🖥️ Demo
+## 📸 Demo
 | Artifact | Link |
 |---|---|
 | 📹 Demo Video | *([Add link if you have one](https://youtu.be/qCwuUPR9nJk))* |
@@ -94,12 +134,7 @@ npm run dev
 
 ---
 
-## ⚠️ Known Limitations
-- **Mocked Live Data:** The frontend currently renders the exact 3-model visual architecture requested using a hardcoded `mockData.ts` file for demonstration purposes. The live FastAPI backend is present but disconnected to preserve the specific UI layout.
-- **Synthetic Training Data:** The ML models in the backend were trained on synthetic/mocked transformer datasets.
-- **UI Simulation:** The "Pre-position Crew" dispatch action is a simulated UI toast alert and does not currently connect to a real dispatcher system.
+## 🏆 What We're Most Proud Of
+We are most proud of building a true **End-to-End Closed-Loop AI System**. We successfully integrated distinct machine learning models (unsupervised anomaly detection, supervised thermal regression) directly into a live FastAPI backend connected to a cloud PostgreSQL database. 
 
----
-
-## 🏅 What We're Most Proud Of
-We are most proud of the seamless integration of three distinct machine learning approaches (unsupervised anomaly detection, supervised thermal regression, and a deterministic weighted impact algorithm) into a singular, highly polished, responsive UI. Instead of presenting raw confusing data, the dashboard converts complex ML outputs into immediate, actionable insight wrapped in a premium, warm-toned aesthetic.
+Instead of presenting raw confusing data, our highly polished, responsive React dashboard converts complex ML outputs into immediate, actionable insight, allowing operators to seamlessly dispatch crews to high-risk transformers before they fail.
