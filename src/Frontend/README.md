@@ -1,32 +1,40 @@
-# React + TypeScript + Vite
+# GridPulse AI - Frontend Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+This directory contains the React user interface for the GridPulse AI Predictive Maintenance System. It is built for speed, responsiveness, and a premium "dark-mode" aesthetic tailored for high-stakes grid operators.
 
-Currently, two official plugins are available:
+## 🚀 Tech Stack
+- **Framework**: React 18 with Vite
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS (with custom tokens in `tailwind.config.js`)
+- **Icons**: Lucide-React
+- **State Management**: React Hooks (State lifted to `App.tsx` for global dispatching)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 📁 Key Features & Components
+1. **Live Dashboard (`AssetTable.tsx` & `AssetInsights.tsx`)**
+   - Fetches live prediction data from the FastAPI backend.
+   - Converts raw ML output (Anomaly Flags, Severe Temperatures) into immediate color-coded alerts (Red/Orange/Green).
+   - "Pre-position Crew" button mathematically filters and assigns maintenance teams to assets with the highest Risk Index.
 
-## React Compiler
+2. **Crew Management (`CrewManagement.tsx`)**
+   - Tracks active crews dispatched to failing transformers.
+   - Operators can "Free Crew" once maintenance is complete, adding the crew back to the available pool.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+3. **Immutable History (`CompletedWork.tsx`)**
+   - A secure ledger of all completed dispatches, including timestamps and duration.
 
-## Expanding the Oxlint configuration
+4. **Live Inference Execution (`AddAssetModal.tsx`)**
+   - Operators can manually input Dissolved Gas Analysis (DGA) telemetry.
+   - Sends a payload to the backend `POST /api/assets/new` to run live Scikit-Learn inference and instantly render the result.
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## 🛠️ Getting Started
+```bash
+# Install dependencies
+npm install
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+# Start the development server
+npm run dev
 ```
+The dashboard runs at `http://localhost:5173`.
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## 🎨 Design Philosophy
+The UI was meticulously crafted to avoid "data fatigue". Grid operators are overwhelmed with raw charts. GridPulse AI abstracts the complexity of `fdd_model.pkl` and `rul_model.pkl` into a clean, actionable **Risk Index (0-100)**, only displaying technical explanations (XAI) when an asset is actively selected.
