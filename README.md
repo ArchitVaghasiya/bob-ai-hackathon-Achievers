@@ -88,9 +88,9 @@ npm run dev
 ## 🖥️ Demo
 | Artifact | Link |
 |---|---|
-| 📹 Demo Video | *(Add link if you have one)* |
-| 🌐 Live Demo | *(Add link if you have one)* |
-| 🖼️ Screenshots | *(Add link if you have one)* |
+| 📹 Demo Video | *([Add link if you have one](https://youtu.be/qCwuUPR9nJk))* |
+| 🌐 Live Demo | *([Add link if you have one](https://youtu.be/qCwuUPR9nJk))* |
+| 🖼️ Screenshots | *([Add link if you have one](https://drive.google.com/drive/folders/1WeXUh6wNGgtj2LLVwk5qfeUk2uwjPR4W?usp=sharing))* |
 
 ---
 
