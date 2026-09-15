@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Zap, AlertTriangle, BatteryWarning, Users } from 'lucide-react';
 import { cn } from '../utils';
+import { type Asset } from '../data/mockData';
 
 interface StatCardProps {
   title: string;
@@ -32,37 +33,51 @@ function StatCard({ title, value, icon, trend, trendUp, alert }: StatCardProps) 
   );
 }
 
-export function StatsBar() {
+interface StatsBarProps {
+  assets: Asset[];
+  availableCrews: number;
+  totalCrews: number;
+}
+
+export function StatsBar({ assets, availableCrews, totalCrews }: StatsBarProps) {
+  const criticalCount = assets.filter(a => a.anomalyStatus === 'Anomaly' || a.riskIndex >= 80).length;
+  
+  // Calculate fake capacity based on high risk assets
+  const highRiskCount = assets.filter(a => a.riskIndex >= 60).length;
+  const atRiskCapacity = assets.length > 0 ? Math.round((highRiskCount / assets.length) * 100) : 0;
+  
+  const deployedCrews = totalCrews - availableCrews;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <StatCard 
         title="Total Substation Assets" 
-        value="1,245" 
+        value={assets.length.toLocaleString()} 
         icon={<Zap className="w-5 h-5" />} 
-        trend="+12 this month"
+        trend="Live Monitored"
         trendUp={false}
       />
       <StatCard 
         title="Active Critical Alerts" 
-        value="4" 
+        value={criticalCount} 
         icon={<AlertTriangle className="w-5 h-5" />} 
-        alert 
-        trend="+2 since yesterday"
-        trendUp={true}
+        alert={criticalCount > 0} 
+        trend={criticalCount > 0 ? "Requires Attention" : "All Clear"}
+        trendUp={criticalCount > 0}
       />
       <StatCard 
         title="At-Risk Grid Capacity" 
-        value="12%" 
+        value={`${atRiskCapacity}%`} 
         icon={<BatteryWarning className="w-5 h-5" />} 
-        trend="High Stress Level"
-        trendUp={true}
+        trend={atRiskCapacity > 20 ? "High Stress Level" : "Normal Load"}
+        trendUp={atRiskCapacity > 20}
       />
       <StatCard 
         title="Pre-positioned Crews" 
-        value="8 / 12" 
+        value={`${deployedCrews} / ${totalCrews}`} 
         icon={<Users className="w-5 h-5" />} 
-        trend="4 available"
-        trendUp={false}
+        trend={`${availableCrews} available`}
+        trendUp={availableCrews === 0}
       />
     </div>
   );

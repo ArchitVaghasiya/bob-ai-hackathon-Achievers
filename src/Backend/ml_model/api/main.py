@@ -8,6 +8,8 @@ import sys
 from typing import List, Dict, Any, Union
 import numpy as np
 import pandas as pd
+import psycopg2
+import psycopg2.extras
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -309,41 +311,161 @@ def predict_batch_transformers(payloads: List[TransformerPredictRequest]):
     return results
 
 
-@app.get(
-    "/predict/demo",
-    response_model=List[TransformerRiskResponse],
-    tags=["Prediction & Risk Assessment"],
-    summary="Fetch live demonstration batch predictions"
-)
-def predict_demo():
+@app.get("/api/assets", tags=["Dashboard"])
+def get_dashboard_assets():
     """
-    Loads 5 sample transformer CSV files from data_test, generates predictions, and returns
-    them sorted by risk score. Used by the React Frontend for a live demo.
+    Returns the dynamic prediction data loaded from the Neon PostgreSQL Database for the UI dashboard.
     """
-    data_dir = os.path.join(SRC_DIR, '..', 'data', 'raw', 'data_test')
-    test_files = [
-        "2_trans_1.csv", "2_trans_10.csv", "2_trans_1003.csv", 
-        "2_trans_1004.csv", "2_trans_1005.csv"
-    ]
+    DB_URL = "postgresql://neondb_owner:npg_Fg4UWAG2nhMR@ep-autumn-truth-aelpp7kz-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+    try:
+        conn = psycopg2.connect(DB_URL)
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        
+        cur.execute("SELECT * FROM grid_assets")
+        rows = cur.fetchall()
+        
+        assets = []
+        for row in rows:
+            # Reconstruct the Asset interface expected by the frontend
+            asset = {
+                "id": row['id'],
+                "substation": row['substation'],
+                "riskIndex": row['risk_index'],
+                "anomalyStatus": row['anomaly_status'],
+                "weatherThreat": row['weather_threat'],
+                "customersImpacted": row['customers_impacted'],
+                **row['model_data']
+            }
+            assets.append(asset)
+            
+        cur.close()
+        conn.close()
+        
+        # Sort by risk descending
+        return sorted(assets, key=lambda x: x['riskIndex'], reverse=True)
+    except Exception as e:
+        print(f"Database error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch data from Neon database.")
+
+
+class NewAssetRequest(BaseModel):
+    H2: float
+    CO: float
+    C2H4: float
+    C2H2: float
+    substation: str
+
+
+@app.post("/api/assets/new", tags=["Dashboard"])
+def add_new_asset(payload: NewAssetRequest):
+    """
+    Synthesizes a 420-step historical sequence from a single set of manual inputs, 
+    runs the ML models, and saves the new asset to the database.
+    """
+    import random
+    import pandas as pd
+    from psycopg2.extras import Json
     
-    results = []
-    for file in test_files:
-        filepath = os.path.join(data_dir, file)
-        if not os.path.exists(filepath):
-            continue
+    DB_URL = "postgresql://neondb_owner:npg_Fg4UWAG2nhMR@ep-autumn-truth-aelpp7kz-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+    
+    # Generate 420 step history ending with user inputs
+    rows = []
+    for step in range(420):
+        # We simulate a walk backward, but simpler is just holding it flat with minor noise
+        # This guarantees the ML model gets the final state exactly as requested
+        noise = lambda val: val * random.uniform(0.98, 1.02)
+        if step == 419:
+            rows.append({'H2': payload.H2, 'CO': payload.CO, 'C2H4': payload.C2H4, 'C2H2': payload.C2H2})
+        else:
+            rows.append({'H2': noise(payload.H2), 'CO': noise(payload.CO), 'C2H4': noise(payload.C2H4), 'C2H2': noise(payload.C2H2)})
             
-        df = pd.read_csv(filepath)
-        req = TransformerPredictRequest(
-            asset_id=file.replace('.csv', ''),
-            data=df[['H2', 'CO', 'C2H4', 'C2H2']].to_dict(orient='records')
-        )
-        try:
-            pred = process_single_transformer_payload(req)
-            results.append(pred)
-        except Exception as e:
-            print(f"Error processing {file}: {e}")
-            
-    return sorted(results, key=lambda x: x['risk_score'], reverse=True)
+    df = pd.DataFrame(rows)
+    asset_id = f"AS-{random.randint(9000, 99999)}"
+    
+    # Extract features & Run Inference
+    features = extract_transformer_features(df, asset_id)
+    df_features = pd.DataFrame([features])
+    results_df = risk_engine.predict_from_features(df_features)
+    
+    risk_result = results_df.iloc[0]
+    risk_score = min(100, max(0, float(risk_result['risk_score'])))
+    anomaly_status = 'Anomaly' if risk_score >= 60 else 'Normal'
+    
+    customers = random.randint(5000, 250000)
+    weather = 'Stable'
+    if risk_score > 85:
+        weather = 'Storm Warning'
+        
+    factors = str(risk_result['top_3_risk_factors'])
+    factors_list = [f.strip() for f in factors.split(';') if f.strip()]
+    if not factors_list:
+        factors_list = ["None detected"]
+        
+    highest_prob = max([
+        float(risk_result['prob_fault_1']),
+        float(risk_result['prob_fault_2']),
+        float(risk_result['prob_fault_3']),
+        float(risk_result['prob_fault_4'])
+    ]) * 100
+    
+    # temperatureData logic
+    base_temp = 55 + (risk_score * 0.2)
+    spike = 15 if risk_score > 85 else (8 if risk_score > 60 else 2)
+    times = ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00']
+    temp_data = []
+    current_temp = base_temp - 5
+    for t in times:
+        predicted = current_temp + random.uniform(-2, 2)
+        actual = predicted + spike + random.uniform(-1, 3) if t in ['12:00', '16:00'] else predicted + random.uniform(-2, 2)
+        temp_data.append({"time": t, "predicted": round(predicted), "actual": round(actual)})
+        current_temp += 3 
+        
+    ui_asset = {
+        "model1": {
+            "anomalyScore": float(risk_result['anomaly_score'] / 100.0),
+            "anomalyFlag": -1 if anomaly_status == 'Anomaly' else 1,
+            "anomalousFeatures": factors_list,
+        },
+        "model2": {
+            "temperatureData": temp_data,
+            "weatherContext": {
+                "ambientTemp": random.randint(20, 35),
+                "humidity": random.randint(30, 95),
+                "windSpeed": random.randint(2, 15),
+            }
+        },
+        "model3": {
+            "failureProbabilityScore": round(highest_prob),
+            "severityScore": round(min(100, risk_score + random.randint(0, 15))),
+            "impactVariables": {
+                "hospitalConnected": random.choice([True, False]),
+                "criticalWaterPlant": random.choice([True, False]),
+                "homesPowered": customers,
+            }
+        }
+    }
+    
+    try:
+        conn = psycopg2.connect(DB_URL)
+        cur = conn.cursor()
+        
+        # Insert to raw
+        cur.execute("INSERT INTO raw_transformers (asset_id, raw_data) VALUES (%s, %s)", (asset_id, Json(df.iloc[-1].to_dict())))
+        
+        # Insert to grid_assets
+        cur.execute('''
+            INSERT INTO grid_assets 
+            (id, substation, risk_index, anomaly_status, weather_threat, customers_impacted, model_data)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        ''', (asset_id, payload.substation, round(risk_score), anomaly_status, weather, customers, Json(ui_asset)))
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        return {"status": "success", "asset_id": asset_id, "risk_score": risk_score}
+    except Exception as e:
+        print(f"Database error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to write to Neon database.")
 
 
 if __name__ == '__main__':

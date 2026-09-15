@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Search, MapPin, Send, CheckCircle2, Users } from 'lucide-react';
 import { type Asset } from '../data/mockData';
 import { cn } from '../utils';
@@ -7,22 +7,46 @@ interface AssetTableProps {
   assets: Asset[];
   onSelectAsset: (asset: Asset) => void;
   selectedAssetId?: string;
-  onDispatchSuccess: (message: string) => void;
+  onDispatchAsset: (assetId: string, assetName: string) => void;
 }
 
-export function AssetTable({ assets, onSelectAsset, selectedAssetId, onDispatchSuccess }: AssetTableProps) {
+export function AssetTable({ assets, onSelectAsset, selectedAssetId, onDispatchAsset }: AssetTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterTier, setFilterTier] = useState<'All' | 'Critical' | 'Elevated' | 'Stable'>('All');
+  const [filterArea, setFilterArea] = useState<string>('All');
+
+  // Extract unique areas from substation names (e.g., "Northside Alpha" -> "Northside")
+  const uniqueAreas = useMemo(() => {
+    const areas = new Set<string>();
+    assets.forEach(a => {
+      const parts = a.substation.split(' ');
+      if (parts.length > 1) {
+        // Assume the last word is the suffix (Alpha, Hub, etc), and the rest is the Area
+        areas.add(parts.slice(0, -1).join(' '));
+      } else {
+        areas.add(a.substation);
+      }
+    });
+    return Array.from(areas).sort();
+  }, [assets]);
 
   const filteredAssets = assets.filter((asset) => {
     const matchesSearch = asset.substation.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter =
+    
+    const matchesTier =
       filterTier === 'All' ? true :
         filterTier === 'Critical' ? asset.riskIndex >= 80 :
           filterTier === 'Elevated' ? asset.riskIndex >= 40 && asset.riskIndex < 80 :
             filterTier === 'Stable' ? asset.riskIndex < 40 : true;
 
-    return matchesSearch && matchesFilter;
+    let matchesArea = true;
+    if (filterArea !== 'All') {
+      const parts = asset.substation.split(' ');
+      const area = parts.length > 1 ? parts.slice(0, -1).join(' ') : asset.substation;
+      matchesArea = area === filterArea;
+    }
+
+    return matchesSearch && matchesTier && matchesArea;
   }).sort((a, b) => b.riskIndex - a.riskIndex);
 
   const getRiskColor = (index: number) => {
@@ -39,14 +63,14 @@ export function AssetTable({ assets, onSelectAsset, selectedAssetId, onDispatchS
 
   const handleDispatch = (e: React.MouseEvent<HTMLButtonElement>, asset: Asset) => {
     e.stopPropagation(); // Prevent row selection
-    onDispatchSuccess(`Crew Dispatched. Relocating team to ${asset.substation} with required cooling oil/parts before peak weather stress window.`);
+    onDispatchAsset(asset.id, asset.substation);
   };
 
   return (
     <div className="card flex flex-col h-full overflow-hidden">
       <div className="p-5 border-b border-border bg-slate-50">
         <h2 className="text-lg font-semibold mb-4">Prioritised Maintenance & Crew Pre-positioning Plan</h2>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-textMuted" />
             <input
@@ -57,6 +81,18 @@ export function AssetTable({ assets, onSelectAsset, selectedAssetId, onDispatchS
               className="w-full bg-white border border-slate-200 rounded-md py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-text"
             />
           </div>
+          
+          <select
+            value={filterArea}
+            onChange={(e) => setFilterArea(e.target.value)}
+            className="bg-white border border-slate-200 rounded-md py-2 px-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-text appearance-none pr-8 cursor-pointer min-w-[140px]"
+          >
+            <option value="All">All Areas</option>
+            {uniqueAreas.map(area => (
+              <option key={area} value={area}>{area}</option>
+            ))}
+          </select>
+          
           <select
             value={filterTier}
             onChange={(e) => setFilterTier(e.target.value as any)}
